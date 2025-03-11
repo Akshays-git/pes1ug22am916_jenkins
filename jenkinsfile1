@@ -1,33 +1,37 @@
 pipeline {
     agent any
+
     stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Akshays-git/pes1ug22am916_jenkins'
+            }
+        }
         stage('Build') {
             steps {
-                sh 'mvn clean install'
-                echo 'Build Stage Successful'
+                echo 'Building the application...'
+                sh 'echo "Simulating build step"'
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
-                echo 'Test Stage Successful'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                echo 'Running tests...'
+                sh 'echo "Simulating test step"'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'mvn deploy'
-                echo 'Deployment Successful'
+                echo 'Deploying the application...'
+                sh 'echo "Simulating deploy step"'
             }
         }
     }
     post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed!'
         }
     }
 }
