@@ -1,36 +1,52 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:14'
+    agent any
+
+    environment {
+        BUILD_DIR = 'build'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Akshays-git/pes1ug22am916_jenkins'
+            }
+        }
+        stage('Setup') {
+            steps {
+                echo 'Setting up environment...'
+                sh 'mkdir -p $BUILD_DIR'
+            }
+        }
+        stage('Parallel Tasks') {
+            parallel {
+                stage('Build') {
+                    steps {
+                        echo 'Compiling source code...'
+                        sh 'g++ -o $BUILD_DIR/hello_exec main/hello.cpp'
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        echo 'Running unit tests...'
+                        sh './$BUILD_DIR/hello_exec'
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                sh 'echo "Simulated deployment step"'
+            }
         }
     }
-    stages {
-        stage('Clone repository') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/Akshays-git/pes1ug22am916_jenkins.git'
-            }
+    
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
         }
-        stage('Install dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Build application') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-        stage('Test application') {
-            steps {
-                sh 'npm test'
-            }
-        }
-        stage('Push Docker image') {
-            steps {
-                sh 'docker build -t <user>/<image>:$BUILD_NUMBER .'
-                sh 'docker push <user>/<image>:$BUILD_NUMBER'
-            }
+        failure {
+            echo 'Pipeline encountered an error!'
         }
     }
 }
